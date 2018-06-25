@@ -42,30 +42,6 @@ class TODOController extends Controller
      */
     protected function store(Request $request)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $name)
-    {
-        $task = Task::where('name', '=', $name)->first();
-
-        // change the attribute
-        $task->text = $request->text;
-        //$task->priority = $request->priority;
-        $task->save();
-        return response()->json([
-            'message' => 'Updated'
-        ], 200);
-    }
-    public function create()
-    {
         $task = Task::create([
             'name' => $request->name,
             'text' => $request->text,
@@ -77,6 +53,38 @@ class TODOController extends Controller
         ], 200);
     }
 
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, $name)
+    {
+        $task = Task::where('name', '=', $name)->firstOrFail();
+
+        // change the attribute
+        $task->text = $request->text;
+        //$task->priority = $request->priority;
+        $task->save();
+        return response()->json([
+            'message' => 'Updated'
+        ], 200);
+    }
+    public function create(Request $request)
+    {
+        
+        $task = Task::create([
+            'name' => $request->name,
+            'text' => $request->text,
+            'priority' => $request->priority,
+        ]);
+        return response()->json([
+            'task' => $task,
+            'message' => 'Success'
+        ], 200);
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -86,7 +94,7 @@ class TODOController extends Controller
      */
     public function destroy($name)
     {
-        $task = Task::findOrFail($name);
+        $task = Task::where('name', $name)->firstOrFail();
         $task->delete();
 
         return response()->json([
