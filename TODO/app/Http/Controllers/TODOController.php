@@ -66,6 +66,7 @@ class TODOController extends Controller
 
         // change the attribute
         $task->text = $request->text;
+        $task->priority = $request->priority;
         //$task->priority = $request->priority;
         $task->save();
         return response()->json([
