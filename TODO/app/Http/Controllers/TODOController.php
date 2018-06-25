@@ -1,8 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use App\Task;
 class TODOController extends Controller
 {
@@ -66,13 +66,24 @@ class TODOController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $task = Task::findOrFail($id);
-        $request->validate([
+        
+        $data = array (
+            'text' => $request->text,
+            'priority' => $request->priority,
+            'completed' => $request->completed,
+            'id' => $id
+        );  
+        $validator = Validator::make($data, [
             'text' => 'required|max:255',
             'completed' => 'required',
-            'priority' => 'required'
+            'priority' => 'required',
+            'id'=>'required|exists:tasks'
         ]);
-        
+        $validator->validate();
+        \Log::debug($data);
+
+       
+        $task = Task::findOrFail($id);
         $task->text = $request->text;
         $task->priority = $request->priority;
         $task->completed = $request->completed;
@@ -94,7 +105,14 @@ class TODOController extends Controller
      */
     public function destroy($id)
     {
-        $task = Task::where('id', $id)->findOrFail();
+        $data = array (
+            'id' => $id
+        );  
+        $validator = Validator::make($data, [
+            'id'=>'required|exists:tasks'
+        ]);
+        $validator->validate();
+        $task = Task::findOrFail($id);
         $task->delete();
 
         return response()->json([
