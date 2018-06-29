@@ -18,7 +18,11 @@ class CreateTasksTable extends Migration
             $table->string('priority');
             $table->string('text');
             $table->boolean('completed');
+            $table->integer('user_id')->unsigned();
             $table->timestamps();
+        });
+        Schema::table('tasks', function($table) {
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

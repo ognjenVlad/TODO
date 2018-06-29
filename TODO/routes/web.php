@@ -12,4 +12,4 @@
 */
 use App\Task;
 
-
+Route::post('/login','LoginController@login');

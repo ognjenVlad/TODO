@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Task;
+use Illuminate\Support\Facades\Auth;
 class TODOController extends Controller
 {
     /**
@@ -13,8 +14,10 @@ class TODOController extends Controller
      */
     public function index()
     {
+        \Log::debug(Auth::id());
         return response()->json([
-            'tasks' =>Task::all()->jsonSerialize()
+            'tasks' =>Task::where('user_id',Auth::id())
+            ->get()->jsonSerialize()
         ], 200);
 
     }
@@ -42,6 +45,7 @@ class TODOController extends Controller
      */
     protected function store(Request $request)
     {
+        \Log::debug($request);
         $request->validate([
             'text' => 'required|max:255',
             'priority' => 'required'
@@ -49,7 +53,8 @@ class TODOController extends Controller
         $task = Task::create([
             'text' => $request->text,
             'priority' => $request->priority,
-            'completed' => 0
+            'completed' => 0,
+            'user_id' => Auth::id() 
         ]);
         return response()->json([
             'task' => $task,
