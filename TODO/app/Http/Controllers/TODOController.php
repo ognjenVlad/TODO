@@ -7,107 +7,51 @@ use App\Task;
 use Illuminate\Support\Facades\Auth;
 class TODOController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
+    
     public function index()
     {
-        \Log::debug(Auth::id());
-        return response()->json([
-            'tasks' =>Task::where('user_id',Auth::id())
-            ->get()->jsonSerialize()
-        ], 200);
-
-    }
-    public function show(Task $task)
-    {
-        //
+        $todos = Task::where('user_id', Auth::id())->get();
+        return response()->json($todos, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Task  $task
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Task $task)
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     protected function store(Request $request)
     {
-        \Log::debug($request);
         $request->validate([
             'text' => 'required|max:255',
             'priority' => 'required'
         ]);
+
         $task = Task::create([
             'text' => $request->text,
             'priority' => $request->priority,
             'completed' => 0,
             'user_id' => Auth::id() 
         ]);
+    
         return response()->json([
             'task' => $task,
-            'message' => 'Success'
-        ], 200);
+        ], 201);
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
     public function update(Request $request, $id)
-    {
-        
-        $data = array (
-            'text' => $request->text,
-            'priority' => $request->priority,
-            'completed' => $request->completed,
-            'id' => $id
-        );  
+    {    
+        $data = $request->all();
+        $data['id'] = $id;
+
         $validator = Validator::make($data, [
             'text' => 'required|max:255',
             'completed' => 'required',
             'priority' => 'required',
-            'id'=>'required|exists:tasks'
+            'id' => 'required|exists:tasks'
         ]);
+
         $validator->validate();
-        \Log::debug($data);
-
-       
         $task = Task::findOrFail($id);
-        $task->text = $request->text;
-        $task->priority = $request->priority;
-        $task->completed = $request->completed;
-        $task->save();
-        return response()->json([
-            'message' => 'Updated'
-        ], 200);
-    }
-    public function create(Request $request)
-    {
-       //
-    }
+        $task->update($data);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
+        return response()->json(200);
+    }
+    
     public function destroy($id)
     {
         $data = array (
@@ -116,13 +60,11 @@ class TODOController extends Controller
         $validator = Validator::make($data, [
             'id'=>'required|exists:tasks'
         ]);
+
         $validator->validate();
         $task = Task::findOrFail($id);
         $task->delete();
 
-        return response()->json([
-            'message' => 'Task deleted successfully!'
-        ], 200);
-
+        return response()->json(204);
     }
 }

@@ -9,7 +9,7 @@ class Task extends Model
     public $timestamps = false;
     
     protected $fillable = [
-        'priority', 'text', 'id', 'completed', 'user_id'
+        'priority', 'text', 'completed', 'user_id'
     ];
 
 }

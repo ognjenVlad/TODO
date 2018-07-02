@@ -13,10 +13,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
 Route::resource('/task', 'TODOController')->middleware('jwt.auth');
+
 Route::group([
 
     'prefix' => 'auth'
@@ -25,6 +23,7 @@ Route::group([
 
     Route::post('login', 'AuthController@login');
     Route::post('logout', 'AuthController@logout');
+    Route::post('register', 'AuthController@register');
 
 });
-Route::post('user/register', 'RegisterController@register');
+
