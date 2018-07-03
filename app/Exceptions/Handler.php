@@ -46,6 +46,17 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $exception)
     {
+        if ($exception instanceof Tymon\JWTAuth\Exceptions\TokenExpiredException) {
+            \Log::debug('TOKEN EXPIRED');
+            return response()->json(['token_expired'], $exception->getStatusCode());
+        } else if ($exception instanceof Tymon\JWTAuth\Exceptions\TokenInvalidException) {
+            \Log::debug('TOKEN_INVALID');
+            return response()->json(['token_invalid'], $exception->getStatusCode());
+        }else if ($exception instanceof \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException) {
+            \Log::debug('TOKEN_ABSCENT');
+            return response()->json(['token_abscent'], $exception->getStatusCode());
+        }
+        \Log::debug('NO EXCEPTION');
         return parent::render($request, $exception);
     }
 }
